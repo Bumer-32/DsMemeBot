@@ -10,7 +10,10 @@ repositories {
 }
 
 dependencies {
-
+    implementation "io.github.cdimascio:dotenv-kotlin:$dotenv_version"
+    implementation "org.slf4j:slf4j-api:$slf4j_version"
+    implementation "ch.qos.logback:logback-classic:$logback_version"
+    implementation "net.dv8tion:JDA:$jda_version"
 }
 
 kotlin {
