@@ -3,6 +3,5 @@ build/
 .kotlin
 .idea
 .vscode
-.env
 
-logs/
+run

@@ -1,15 +1,25 @@
 package ua.pp.lumivoid
 
 import io.github.cdimascio.dotenv.Dotenv
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import kotlinx.serialization.json.Json
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.slf4j.LoggerFactory
+import ua.pp.lumivoid.commands.AddSound
 import ua.pp.lumivoid.commands.Connect
 import ua.pp.lumivoid.commands.Disconnect
+import ua.pp.lumivoid.commands.ListSound
 import ua.pp.lumivoid.commands.Ping
+import ua.pp.lumivoid.commands.RemoveSound
+import ua.pp.lumivoid.util.ModelManager
+import ua.pp.lumivoid.util.SoundData
+import java.io.File
+
 
 fun main() {
     Main.main()
@@ -17,12 +27,27 @@ fun main() {
 
 object Main {
     private val logger = LoggerFactory.getLogger(this.javaClass)
+    private val json = Json
 
     val start = System.currentTimeMillis()
+    val httpClient = HttpClient(CIO)
+
+    val sounds = mutableListOf<SoundData>()
 
     fun main() {
         val dotenv = Dotenv.load()
         val token = dotenv["DISCORD_TOKEN"]
+
+        ModelManager.prepare()
+
+        File(Constants.SOUNDS_PATH).mkdirs()
+
+        val soundsFile = File(Constants.SOUNDS_FILE_PATH)
+
+        if (soundsFile.exists()) {
+            val data = json.decodeFromString<MutableList<SoundData>>(soundsFile.readText())
+            data.forEach { sounds.add(it) }
+        }
 
         val intents = setOf(
             GatewayIntent.GUILD_MESSAGES,
@@ -42,7 +67,15 @@ object Main {
         Ping.register()
         Connect.register()
         Disconnect.register()
+        AddSound.register()
+        ListSound.register()
+        RemoveSound.register()
 
         logger.info("-=-=-=-=-=-=-REGISTERING COMMANDS-=-=-=-=-=-=-")
+    }
+
+    fun writeSoundsFile() {
+        val soundsFile = File(Constants.SOUNDS_FILE_PATH)
+        soundsFile.writeText(json.encodeToString(sounds))
     }
 }

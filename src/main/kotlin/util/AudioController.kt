@@ -6,9 +6,14 @@ import net.dv8tion.jda.api.audio.CombinedAudio
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.managers.AudioManager
 import org.slf4j.LoggerFactory
+import java.io.FileInputStream
+import java.io.InputStream
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 import java.nio.ByteBuffer
-import java.util.Queue
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
+import javax.sound.sampled.AudioFormat
 
 object AudioController {
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -25,8 +30,8 @@ object AudioController {
             val guild = channel.guild
             currentAudioManager = guild.audioManager
 
-            currentAudioManager!!.sendingHandler = EchoHandler
-            currentAudioManager!!.receivingHandler = EchoHandler
+            currentAudioManager!!.sendingHandler = AudioOutputHandler
+            currentAudioManager!!.receivingHandler = AudioInputHandler
             currentAudioManager!!.openAudioConnection(channel)
 
             logger.info("Connected to voice channel ${channel.name}")
@@ -39,32 +44,73 @@ object AudioController {
         currentAudioManager = null
     }
 
-    object EchoHandler: AudioSendHandler, AudioReceiveHandler {
-        private val queue: Queue<ByteArray> = ConcurrentLinkedQueue()
+    fun getAudioInput(): Pair<PipedInputStream, AudioFormat> {
+        val output = PipedOutputStream()
+        val input = PipedInputStream(output)
 
-        override fun canReceiveCombined(): Boolean {
-            return queue.size < 10
+        val thread = Thread {
+            logger.info("New stream")
+
+            while (true) {
+                val data = AudioInputHandler.buffer.poll()
+                if (data != null) output.write(data)
+                else Thread.sleep(10)
+            }
         }
+        thread.isDaemon = true
+        thread.name = "AudioStream"
+        thread.start()
+        val format = AudioFormat(96000f, 16, 1, true, true)
+        return Pair(input, format)
+    }
+
+    fun playFile(path: String) {
+        val fis = FileInputStream(path)
+        synchronized (AudioOutputHandler.queue) {
+            AudioOutputHandler.queue.add(fis)
+        }
+    }
+
+    private object AudioInputHandler: AudioReceiveHandler {
+        val buffer = ConcurrentLinkedQueue<ByteArray>()
+
+        // receive
+        override fun canReceiveCombined(): Boolean = true
 
         override fun handleCombinedAudio(combinedAudio: CombinedAudio) {
-            if (combinedAudio.users.isEmpty()) return
-
             val data = combinedAudio.getAudioData(1.0)
-            queue.add(data)
+            buffer.add(data)
         }
+    }
+
+    private object AudioOutputHandler: AudioSendHandler {
+        val queue = LinkedList<InputStream>()
+        private var currentStream: InputStream? = null
+        private const val BUFFER_SIZE = 3840
+        private val buffer = ByteArray(BUFFER_SIZE)
+
 
         override fun canProvide(): Boolean {
-            return queue.isNotEmpty()
+            if (currentStream == null) {
+                synchronized(queue) {
+                    currentStream = if (queue.isNotEmpty()) queue.poll() else null
+                }
+            }
+            return currentStream != null
         }
 
         override fun provide20MsAudio(): ByteBuffer? {
-            val data = queue.poll()
-            return if (data == null) null else ByteBuffer.wrap(data)
+            val stream = currentStream ?: return null
+            val read = stream.read(buffer)
+            if (read == -1) {
+                currentStream?.close()
+                currentStream = null
+                return null
+            }
+
+            return ByteBuffer.wrap(buffer, 0, read)
         }
 
-        override fun isOpus(): Boolean {
-            return false
-        }
-
+        override fun isOpus(): Boolean = false
     }
 }

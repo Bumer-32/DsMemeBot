@@ -1,4 +1,4 @@
-package ua.pp.lumivoid
+package ua.pp.lumivoid.util
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
@@ -11,7 +11,7 @@ object Commands {
 
     fun tryCallCommand(text: String, event: MessageReceivedEvent) {
         commands.forEach {
-            if (it.key.startsWith(text) ) {
+            if (text.startsWith(it.key) ) {
                 it.value.invoke(event)
                 return
             }

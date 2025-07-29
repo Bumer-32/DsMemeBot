@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import org.slf4j.LoggerFactory
+import ua.pp.lumivoid.util.Commands
 
 object Listener: ListenerAdapter() {
     private val logger = LoggerFactory.getLogger(this.javaClass)

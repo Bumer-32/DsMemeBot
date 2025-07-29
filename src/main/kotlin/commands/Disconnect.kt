@@ -1,7 +1,8 @@
 package ua.pp.lumivoid.commands
 
-import ua.pp.lumivoid.Commands
+import ua.pp.lumivoid.util.Commands
 import ua.pp.lumivoid.util.AudioController
+import ua.pp.lumivoid.util.Vosk
 
 object Disconnect: Command("!!disconnect") {
     override fun register() {
@@ -9,6 +10,7 @@ object Disconnect: Command("!!disconnect") {
             logger.info("Disconnecting from voice channel")
             event.message.reply("Disconnecting from voice channel.").queue()
             AudioController.disconnect()
+            Vosk.disable()
         }
     }
 }
