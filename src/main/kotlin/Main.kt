@@ -16,6 +16,7 @@ import ua.pp.lumivoid.commands.Disconnect
 import ua.pp.lumivoid.commands.ListSound
 import ua.pp.lumivoid.commands.Ping
 import ua.pp.lumivoid.commands.RemoveSound
+import ua.pp.lumivoid.commands.commands.Stop
 import ua.pp.lumivoid.util.ModelManager
 import ua.pp.lumivoid.util.SoundData
 import java.io.File
@@ -27,7 +28,9 @@ fun main() {
 
 object Main {
     private val logger = LoggerFactory.getLogger(this.javaClass)
-    private val json = Json
+    private val json = Json {
+        prettyPrint = true
+    }
 
     val start = System.currentTimeMillis()
     val httpClient = HttpClient(CIO)
@@ -70,6 +73,7 @@ object Main {
         AddSound.register()
         ListSound.register()
         RemoveSound.register()
+        Stop.register()
 
         logger.info("-=-=-=-=-=-=-REGISTERING COMMANDS-=-=-=-=-=-=-")
     }

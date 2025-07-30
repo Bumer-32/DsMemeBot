@@ -9,8 +9,8 @@ object Disconnect: Command("!!disconnect") {
         Commands.registerCommand(this.command) { event ->
             logger.info("Disconnecting from voice channel")
             event.message.reply("Disconnecting from voice channel.").queue()
+            Vosk.stop()
             AudioController.disconnect()
-            Vosk.disable()
         }
     }
 }
