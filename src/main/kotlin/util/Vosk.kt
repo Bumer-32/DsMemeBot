@@ -57,7 +57,7 @@ object Vosk {
                     if (nbytes >= 0) {
                         if (recognizer!!.acceptWaveForm(bytes, nbytes)) {
                             val result = json.decodeFromString<Message>(recognizer!!.finalResult).text
-                            if (result.isNotEmpty()) {
+                            if (result.isNotEmpty() && !AudioController.isPlaying()) {
                                 logger.info("result: \"$result\"")
                                 val sound = Main.sounds.find { it.phrases.contains(result) }
                                 if (sound != null) {

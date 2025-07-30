@@ -1,6 +1,6 @@
 package ua.pp.lumivoid
 
-import io.github.cdimascio.dotenv.Dotenv
+import io.github.cdimascio.dotenv.dotenv
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import kotlinx.serialization.json.Json
@@ -38,7 +38,11 @@ object Main {
     val sounds = mutableListOf<SoundData>()
 
     fun main() {
-        val dotenv = Dotenv.load()
+        logger.info("Starting Bot")
+
+        val dotenv = dotenv {
+            directory = Constants.CONFIG_PATH.absolutePath
+        }
         val token = dotenv["DISCORD_TOKEN"]
 
         ModelManager.prepare()

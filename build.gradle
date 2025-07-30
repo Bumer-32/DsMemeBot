@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ua.pp.lumivoid"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -38,6 +38,12 @@ jar {
     }
 }
 
+shadowJar {
+    archiveBaseName.set("DsMemeBot")
+    archiveVersion.set(version)
+    archiveClassifier.set("all")
+}
+
 processResources {
     from("LICENSE")
 }
@@ -46,7 +52,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId = group
-            artifactId = "SSWD"
+            artifactId = "DsMemeBot"
             version = version
 
             artifact shadowJar

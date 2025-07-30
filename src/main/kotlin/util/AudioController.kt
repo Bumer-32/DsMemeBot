@@ -71,6 +71,8 @@ object AudioController {
         }
     }
 
+    fun isPlaying(): Boolean = AudioOutputHandler.currentStream != null
+
     private object AudioInputHandler: AudioReceiveHandler {
         val buffer = ConcurrentLinkedQueue<ByteArray>()
 
@@ -85,7 +87,7 @@ object AudioController {
 
     private object AudioOutputHandler: AudioSendHandler {
         val queue = LinkedList<InputStream>()
-        private var currentStream: InputStream? = null
+        var currentStream: InputStream? = null
         private const val BUFFER_SIZE = 3840
         private val buffer = ByteArray(BUFFER_SIZE)
 

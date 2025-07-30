@@ -1,0 +1,9 @@
+services:
+  ds_meme_bot:
+    build: .
+    container_name: DsMemeBot
+
+    volumes:
+      - "./run:/app/config"
+
+    restart: unless-stopped
