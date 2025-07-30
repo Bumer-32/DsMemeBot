@@ -1,7 +1,6 @@
-package ua.pp.lumivoid.commands.commands
+package ua.pp.lumivoid.commands
 
 import ua.pp.lumivoid.util.Commands
-import ua.pp.lumivoid.commands.Command
 import kotlin.system.exitProcess
 
 object Stop: Command("!!stop") {
