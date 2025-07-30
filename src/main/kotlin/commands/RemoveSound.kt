@@ -14,6 +14,7 @@ object RemoveSound: Command("!!remove") {
                 val toRemove = Main.sounds.find { it.name == content.replace(this.command, "").trim() }
                 if (toRemove != null) {
                     File(Constants.SOUNDS_PATH, "${toRemove.name}.mp3").delete()
+                    File(Constants.SOUNDS_PATH, "${toRemove.name}.pcm").delete()
                     Main.sounds.remove(toRemove)
                     Main.writeSoundsFile()
                     Vosk.updateGrammarList()
