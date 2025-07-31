@@ -8,7 +8,7 @@ object ListSound: Command("!!list") {
         Commands.registerCommand(this.command) { event ->
             var names = "```"
             Main.sounds.forEach { sound ->
-                names += sound.name + "\n"
+                names += "${sound.name} -> ${sound.phrases.joinToString(", ")}\n"
             }
             names += "```"
 
