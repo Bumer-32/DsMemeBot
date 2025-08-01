@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "ua.pp.lumivoid"
-version = "1.0"
+version = "2.0"
 
 repositories {
     mavenCentral()
@@ -26,6 +26,8 @@ dependencies {
     implementation "io.ktor:ktor-client-cio:$ktor_version"
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlin_serialization_version"
+
+    implementation "org.apache.commons:commons-text:$commons_text_version"
 }
 
 kotlin {
@@ -44,7 +46,21 @@ shadowJar {
     archiveClassifier.set("all")
 }
 
+tasks.register("packPython") {
+    group = "build"
+
+    def input = file("src/main/python")
+    def outputZip = file("$buildDir/resources/main/stt.zip")
+
+    doLast {
+        ant.zip(destfile: outputZip, basedir: input)
+        logger.info("Python files have been archived as: $outputZip")
+    }
+}
+
 processResources {
+    dependsOn tasks.packPython
+
     from("LICENSE")
 }
 

@@ -17,8 +17,9 @@ import ua.pp.lumivoid.commands.ListSound
 import ua.pp.lumivoid.commands.Ping
 import ua.pp.lumivoid.commands.RemoveSound
 import ua.pp.lumivoid.commands.Stop
-import ua.pp.lumivoid.util.ModelManager
-import ua.pp.lumivoid.util.SoundData
+import ua.pp.lumivoid.sound.SoundData
+import ua.pp.lumivoid.util.SoundsComparator
+import ua.pp.lumivoid.util.SttManager
 import java.io.File
 
 
@@ -41,11 +42,10 @@ object Main {
         logger.info("Starting Bot")
 
         val dotenv = dotenv {
-            directory = Constants.CONFIG_PATH.absolutePath
+            directory = Constants.APP_PATH.absolutePath
         }
         val token = dotenv["DISCORD_TOKEN"]
-
-        ModelManager.prepare()
+        val language = dotenv["PREFERRED_LANGUAGE"]
 
         File(Constants.SOUNDS_PATH).mkdirs()
 
@@ -55,6 +55,10 @@ object Main {
             val data = json.decodeFromString<MutableList<SoundData>>(soundsFile.readText())
             data.forEach { sounds.add(it) }
         }
+
+        SttManager.prepare()
+        SttManager.setLanguage(language)
+        SoundsComparator.setup(language)
 
         val intents = setOf(
             GatewayIntent.GUILD_MESSAGES,

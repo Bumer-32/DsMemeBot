@@ -7,8 +7,8 @@ import kotlinx.coroutines.runBlocking
 import ua.pp.lumivoid.Constants
 import ua.pp.lumivoid.Main
 import ua.pp.lumivoid.util.Commands
-import ua.pp.lumivoid.util.SoundData
-import ua.pp.lumivoid.util.Vosk
+import ua.pp.lumivoid.sound.SoundData
+import ua.pp.lumivoid.util.SoundsComparator
 import java.io.File
 
 object AddSound: Command("!!add") {
@@ -63,12 +63,12 @@ object AddSound: Command("!!add") {
             }
 
             logger.info("Converting to raw")
-            ProcessBuilder("ffmpeg", "-i", file.absolutePath, "-f", "s16be", "-ar", "48000", "-ac", "2", rawFile.absolutePath).redirectError(ProcessBuilder.Redirect.INHERIT).start()
+            event.channel.sendMessage("Converting...").queue()
+            ProcessBuilder("ffmpeg", "-i", file.absolutePath, "-f", "s16be", "-ar", "48000", "-ac", "2", rawFile.absolutePath).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectError(ProcessBuilder.Redirect.INHERIT).start()
 
             Main.sounds.add(SoundData(name, phrases))
             Main.writeSoundsFile()
-            Vosk.addChannel(event.channel)
-            Vosk.updateGrammarList()
+            SoundsComparator.updatePhrasesList()
 
             logger.info("Added sound \"$name\" with phrases: $phrases")
             event.channel.sendMessage("Added sound \"$name\" with phrases $phrases").queue()

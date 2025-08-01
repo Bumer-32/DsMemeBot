@@ -1,5 +1,5 @@
 <configuration>
-    <property name="LOG_DIR" value="logs"/>
+    <property name="LOG_DIR" value="app/logs"/>
     <timestamp key="START_TIME" datePattern="yyyy-MM-dd_HH-mm-ss"/>
 
     <!-- Latest.log (overwrite each run) -->

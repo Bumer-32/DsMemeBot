@@ -3,7 +3,7 @@ package ua.pp.lumivoid.commands
 import ua.pp.lumivoid.Constants
 import ua.pp.lumivoid.Main
 import ua.pp.lumivoid.util.Commands
-import ua.pp.lumivoid.util.Vosk
+import ua.pp.lumivoid.util.SoundsComparator
 import java.io.File
 
 object RemoveSound: Command("!!remove") {
@@ -17,7 +17,7 @@ object RemoveSound: Command("!!remove") {
                     File(Constants.SOUNDS_PATH, "${toRemove.name}.pcm").delete()
                     Main.sounds.remove(toRemove)
                     Main.writeSoundsFile()
-                    Vosk.updateGrammarList()
+                    SoundsComparator.updatePhrasesList()
                     logger.info("Removed sound ${toRemove.name}")
                     event.message.reply("Removed sound ${toRemove.name}").queue()
                 }
